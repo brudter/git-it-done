@@ -1,4 +1,4 @@
-
+var languageButtonsEl = document.querySelector("#language-buttons")
 var userFormEl = document.querySelector("#user-form");
 var nameInputEl = document.querySelector("#username");
 var repoContainerEl = document.querySelector("#repos-container");
@@ -19,6 +19,18 @@ var username = nameInputEl.value.trim();
 
     console.log(event);
 };
+
+var buttonClickHandler = function(event) {
+    var language = event.target.getAttribute("data-language")
+    
+    if (language) {
+        getFeaturedRepos(language);
+      
+        // clear old content
+        repoContainerEl.textContent = "";
+      }
+    console.log(language)
+}
 
 userFormEl.addEventListener("submit", formSubmitHandler);
 
@@ -41,6 +53,20 @@ fetch(apiUrl)
       alert("Unable to connect to GitHub");
     });
 };
+
+var getFeaturedRepos = function(language) {
+    var apiUrl = "https://api.github.com/search/repositories?q=" + language + "+is:featured&sort=help-wanted-issues";
+  
+    fetch(apiUrl).then(function(response){
+        if (response.ok) {
+            response.json().then(function(data) {
+            displayRepos(data.items, language);
+            });
+        } else {
+            alert("Error: GitHub User Not Found")
+        }
+    });
+  };
 
 var displayRepos = function(repos, searchTerm) {
 
@@ -90,9 +116,9 @@ repoEl.appendChild(statusEl);
 
   };
 
-console.log("outside")
-
 getUserRepos();
+
+languageButtonsEl.addEventListener("click", buttonClickHandler);
 
 // var response = fetch("https://api.github.com/users/octocat/repos");
 // console.log(response);
